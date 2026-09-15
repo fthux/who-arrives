@@ -10,15 +10,15 @@ async function get(query = '') {
   return response.json();
 }
 const basic = await get();
-assert.deepEqual(Object.keys(basic).sort(), ['ip', 'country', 'continent', 'city', 'region', 'postalCode', 'location', 'metroCode', 'asn'].sort());
+assert.deepEqual(Object.keys(basic).sort(), ['ip', 'countryOrRegion', 'continent', 'city', 'region', 'postalCode', 'location', 'metroCode', 'asn'].sort());
 assert.deepEqual(await get('?fields='), basic);
 const { enrichment, ...sameBasic } = await get('?fields=all');
 assert.deepEqual(sameBasic, basic);
-assert.deepEqual(Object.keys(enrichment).sort(), ['country', 'continent', 'ip', 'location'].sort());
-assert.deepEqual(Object.keys(enrichment.country).sort(), ['name', 'flag', 'capitals', 'currencies', 'languages', 'callingCodes'].sort());
-const country = Object.hasOwn(countries, basic.country.code) ? countries[basic.country.code] : null;
-assert.equal(enrichment.country.name, country?.name ?? null);
-assert.deepEqual(enrichment.country.callingCodes, country?.callingCodes ?? null);
+assert.deepEqual(Object.keys(enrichment).sort(), ['countryOrRegion', 'continent', 'ip', 'location'].sort());
+assert.deepEqual(Object.keys(enrichment.countryOrRegion).sort(), ['name', 'flag', 'capitals', 'currencies', 'languages', 'callingCodes'].sort());
+const country = Object.hasOwn(countries, basic.countryOrRegion.code) ? countries[basic.countryOrRegion.code] : null;
+assert.equal(enrichment.countryOrRegion.name, country?.name ?? null);
+assert.deepEqual(enrichment.countryOrRegion.callingCodes, country?.callingCodes ?? null);
 if (basic.location.timezone) {
   const time = enrichment.location.time;
   assert.ok(time);
@@ -26,9 +26,9 @@ if (basic.location.timezone) {
   assert.equal(Date.parse(time.dateTime), Math.floor(Date.parse(time.evaluatedAt) / 1000) * 1000);
 }
 const flag = await get('?fields=flag');
-assert.deepEqual(flag.enrichment, { country: { flag: enrichment.country.flag } });
+assert.deepEqual(flag.enrichment, { countryOrRegion: { flag: enrichment.countryOrRegion.flag } });
 const repeated = await get('?fields=names,%20flag%20&fields=flag');
-assert.deepEqual(repeated.enrichment, { country: { name: enrichment.country.name, flag: enrichment.country.flag }, continent: enrichment.continent });
+assert.deepEqual(repeated.enrichment, { countryOrRegion: { name: enrichment.countryOrRegion.name, flag: enrichment.countryOrRegion.flag }, continent: enrichment.continent });
 for (const query of ['?fields=all,typo', '?fields=names&lang=en', '?ip=8.8.8.8']) {
   assert.equal((await fetch(`${base}/${query}`)).status, 400);
 }

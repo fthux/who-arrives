@@ -9,7 +9,7 @@ function request(path = '/', cf?: Record<string, unknown>, headers: Record<strin
 }
 
 const emptyClient = {
-  ip: null, country: { code: null, isEUCountry: null }, continent: null, city: null,
+  ip: null, countryOrRegion: { code: null, isEUCountry: null }, continent: null, city: null,
   region: { name: null, code: null }, postalCode: null,
   location: { latitude: null, longitude: null, timezone: null },
   metroCode: null, asn: { number: null, organization: null },
@@ -28,7 +28,7 @@ test('returns exactly client fields, normalizes types, and excludes all edge/con
   const response = worker.fetch(request('/', fixture, { 'CF-Connecting-IP': '203.0.113.1' }));
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
-    ip: '203.0.113.1', country: { code: 'DE', isEUCountry: true }, continent: 'EU', city: 'Berlin',
+    ip: '203.0.113.1', countryOrRegion: { code: 'DE', isEUCountry: true }, continent: 'EU', city: 'Berlin',
     region: { name: 'Berlin', code: 'BE' }, postalCode: '10115',
     location: { latitude: 52.52, longitude: 13.405, timezone: 'Europe/Berlin' },
     metroCode: '001', asn: { number: 64500, organization: 'Example Network' },
@@ -49,7 +49,7 @@ test('handles zero coordinates, false EU membership, and invalid values', async 
   const valid = await worker.fetch(request('/', { latitude: '0', longitude: '0', isEUCountry: false })).json();
   assert.equal(valid.location.latitude, 0);
   assert.equal(valid.location.longitude, 0);
-  assert.equal(valid.country.isEUCountry, false);
+  assert.equal(valid.countryOrRegion.isEUCountry, false);
   const invalid = await worker.fetch(request('/', { latitude: '', longitude: '181', asn: NaN, city: '', isEUCountry: 'unknown' })).json();
   assert.deepEqual(invalid, emptyClient);
 });
@@ -59,7 +59,7 @@ test('preserves original IPv6 under Pseudo IPv4 and isolates requests', async ()
   const second = await worker.fetch(request('/', {}, { 'CF-Connecting-IP': '203.0.113.2' })).json();
   assert.equal(first.ip, '2001:db8::1');
   assert.equal(second.ip, '203.0.113.2');
-  assert.deepEqual(second.country, { code: null, isEUCountry: null });
+  assert.deepEqual(second.countryOrRegion, { code: null, isEUCountry: null });
 });
 
 test('routes, unsupported lookups, methods and browser preflight', async () => {

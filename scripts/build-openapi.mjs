@@ -8,7 +8,7 @@ const list = items => ({ type: ['array', 'null'], items });
 const ref = name => ({ $ref: `#/components/schemas/${name}` });
 const fields = ['names', 'flag', 'ipVersion', 'time', 'capitals', 'currencies', 'languages', 'callingCodes', 'all'];
 const basic = {
-  ip: string, country: object({ code: string, isEUCountry: boolean }), continent: string, city: string,
+  ip: string, countryOrRegion: object({ code: { ...string, description: 'Country or region code from Cloudflare, normally ISO 3166-1 alpha-2 (e.g. HK for Hong Kong); special source codes are preserved. A code does not imply sovereign statehood.' }, isEUCountry: boolean }), continent: string, city: string,
   region: object({ name: string, code: string }), postalCode: string,
   location: object({ latitude: { ...number, minimum: -90, maximum: 90 }, longitude: { ...number, minimum: -180, maximum: 180 }, timezone: string }),
   metroCode: string, asn: object({ number: { type: ['integer', 'null'], minimum: 1 }, organization: string }),
@@ -46,7 +46,7 @@ const spec = {
     ClientResponse: object({ ...basic, enrichment: ref('Enrichment') }, Object.keys(basic)),
     Enrichment: object({
       ip: object({ version: { type: ['string', 'null'], enum: ['IPv4', 'IPv6', null] } }),
-      country: object({
+      countryOrRegion: object({
         name: string, flag: string, capitals: list({ type: 'string' }),
         currencies: list(object({ code: { type: 'string', pattern: '^[A-Z]{3}$' }, name: string, symbol: string })),
         languages: list(object({ code: { type: 'string', description: 'ISO 639-3 language code', pattern: '^[a-z]{3}$' }, name: { type: 'string' } })),

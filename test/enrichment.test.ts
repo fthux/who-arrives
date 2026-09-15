@@ -16,7 +16,7 @@ const instant = new Date('2026-09-16T08:00:00Z');
 
 test('all enrichments match the documented nested contract', () => {
   assert.deepEqual(enrich(clientInfo(request('', cf)), parseFields(new URLSearchParams('fields=all')), instant), {
-    country: {
+    countryOrRegion: {
       name: 'Germany', flag: '🇩🇪', capitals: ['Berlin'],
       currencies: [{ code: 'EUR', name: 'Euro', symbol: '€' }],
       languages: [{ code: 'deu', name: 'German' }], callingCodes: ['+49'],
@@ -42,9 +42,9 @@ test('every field subset preserves basic fields and only adds the requested path
       return paths(value as Record<string, unknown>, path);
     });
     const expectedPaths = selected.flatMap(field => ({
-      names: ['country.name', 'continent.name'], flag: ['country.flag'], ipVersion: ['ip.version'],
-      time: ['location.time'], capitals: ['country.capitals'], currencies: ['country.currencies'],
-      languages: ['country.languages'], callingCodes: ['country.callingCodes'],
+      names: ['countryOrRegion.name', 'continent.name'], flag: ['countryOrRegion.flag'], ipVersion: ['ip.version'],
+      time: ['location.time'], capitals: ['countryOrRegion.capitals'], currencies: ['countryOrRegion.currencies'],
+      languages: ['countryOrRegion.languages'], callingCodes: ['countryOrRegion.callingCodes'],
     })[field]);
     assert.deepEqual(paths(enrichment).sort(), expectedPaths.sort());
   }
@@ -67,12 +67,12 @@ test('missing or special source codes never fabricate data or use country capita
   for (const code of [undefined, 'XX', 'T1', '__proto__', 'constructor', 'ZZ']) {
     const client = clientInfo(request('', { country: code, continent: 'unknown', timezone: 'Invalid/Timezone' }, 'invalid'));
     assert.deepEqual(enrich(client, new Set(FIELD_NAMES), instant), {
-      country: { name: null, flag: null, capitals: null, currencies: null, languages: null, callingCodes: null },
+      countryOrRegion: { name: null, flag: null, capitals: null, currencies: null, languages: null, callingCodes: null },
       continent: { name: null }, ip: { version: null }, location: { time: null },
     });
   }
   const partial = enrich(clientInfo(request('', { country: 'DE' })), new Set(['time', 'names']), instant);
-  assert.equal(partial.country?.name, 'Germany');
+  assert.equal(partial.countryOrRegion?.name, 'Germany');
   assert.equal(partial.location?.time, null);
   assert.equal(partial.continent?.name, null);
 });
@@ -116,7 +116,7 @@ test('bundled lists preserve multiple values, country calling codes, and request
   assert.ok(Object.values(countries).some(country => country.currencies.length > 1));
   const client = clientInfo(request('', cf));
   const first = enrich(client, new Set(['capitals']), instant);
-  first.country!.capitals!.push('Not a capital');
-  assert.deepEqual(enrich(client, new Set(['capitals']), instant).country?.capitals, ['Berlin']);
-  assert.deepEqual(enrich(client, new Set(['flag']), instant), { country: { flag: '🇩🇪' } });
+  first.countryOrRegion!.capitals!.push('Not a capital');
+  assert.deepEqual(enrich(client, new Set(['capitals']), instant).countryOrRegion?.capitals, ['Berlin']);
+  assert.deepEqual(enrich(client, new Set(['flag']), instant), { countryOrRegion: { flag: '🇩🇪' } });
 });

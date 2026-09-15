@@ -24,7 +24,7 @@ export function clientInfo(request: Request) {
   return {
     // Preserve the real IPv6 address when Pseudo IPv4 overwrites CF-Connecting-IP.
     ip: cf ? text(request.headers.get('CF-Connecting-IPv6')) ?? text(request.headers.get('CF-Connecting-IP')) : null,
-    country: {
+    countryOrRegion: {
       code: text(cf?.country),
       isEUCountry: euCountry(cf?.isEUCountry),
     },

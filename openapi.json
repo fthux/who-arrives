@@ -177,7 +177,7 @@
               "null"
             ]
           },
-          "country": {
+          "countryOrRegion": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -185,7 +185,8 @@
                 "type": [
                   "string",
                   "null"
-                ]
+                ],
+                "description": "Country or region code from Cloudflare, normally ISO 3166-1 alpha-2 (e.g. HK for Hong Kong); special source codes are preserved. A code does not imply sovereign statehood."
               },
               "isEUCountry": {
                 "type": [
@@ -307,7 +308,7 @@
         },
         "required": [
           "ip",
-          "country",
+          "countryOrRegion",
           "continent",
           "city",
           "region",
@@ -341,7 +342,7 @@
               "version"
             ]
           },
-          "country": {
+          "countryOrRegion": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
