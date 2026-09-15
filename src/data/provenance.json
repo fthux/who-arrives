@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-09-15T16:50:51.673Z",
+  "records": 250,
+  "sources": [
+    {
+      "repository": "https://github.com/mledoze/countries",
+      "commit": "c8015eebdd94c533358406b0d709f441389e1f2e",
+      "url": "https://raw.githubusercontent.com/mledoze/countries/c8015eebdd94c533358406b0d709f441389e1f2e/countries.json",
+      "sha256": "99b85dda36895c79caf72e191d035e4b9d82e811ee34f9ca15dfa67d7c561ba8",
+      "license": "ODbL-1.0"
+    },
+    {
+      "repository": "https://github.com/google/libphonenumber",
+      "commit": "806ee32e8c8c74ca339d8c91a6d86ef58687c9f4",
+      "url": "https://raw.githubusercontent.com/google/libphonenumber/806ee32e8c8c74ca339d8c91a6d86ef58687c9f4/resources/PhoneNumberMetadata.xml",
+      "sha256": "aeebc3f70b8b11dc320e449f1b6ace73a8aaff5789990e1cb6b4b75257eb81bc",
+      "license": "Apache-2.0"
+    }
+  ]
+}

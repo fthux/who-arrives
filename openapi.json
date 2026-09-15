@@ -1,0 +1,531 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Who Arrives",
+    "version": "1.1.0",
+    "description": "Current client public IP, geolocation and ASN from Cloudflare, with optional English enrichment computed locally or read from bundled data. No arbitrary IP lookup. Country reference data does not describe personal language, currency or phone usage. Bundled country data derives from mledoze/countries (ODbL-1.0); country calling codes derive from Google libphonenumber (Apache-2.0). See licenses/README.md and src/data/provenance.json in the source distribution."
+  },
+  "servers": [
+    {
+      "url": "https://who-arrives-api.fthux.com"
+    },
+    {
+      "url": "http://127.0.0.1:8787",
+      "description": "Local Wrangler dev server; geolocation may be simulated"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getClient",
+        "summary": "Get basic client information and selected enrichment",
+        "parameters": [
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Add enrichment to the unchanged basic response. Comma-separated, case-sensitive selections: names, flag, ipVersion, time, capitals, currencies, languages, callingCodes, all. Repeated fields parameters are merged; whitespace, duplicates and empty tokens are ignored. All tokens are validated before all expands. Missing or empty fields returns only basic data. Unknown fields or query parameter names return 400.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "names,flag,time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Basic fields always present. Enrichment groups and fields appear only when requested. Requested unavailable values are null; known empty lists are [].",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "private, no-store, max-age=0"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string",
+                  "const": "*"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown field or unsupported query parameter",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "private, no-store, max-age=0"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string",
+                  "const": "*"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "headClient",
+        "summary": "Validate a lookup and return headers without a body",
+        "parameters": [
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Add enrichment to the unchanged basic response. Comma-separated, case-sensitive selections: names, flag, ipVersion, time, capitals, currencies, languages, callingCodes, all. Repeated fields parameters are merged; whitespace, duplicates and empty tokens are ignored. All tokens are validated before all expands. Missing or empty fields returns only basic data. Unknown fields or query parameter names return 400.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "names,flag,time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lookup accepted; no body",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "private, no-store, max-age=0"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string",
+                  "const": "*"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query; no body",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "private, no-store, max-age=0"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string",
+                  "const": "*"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "operationId": "preflightClient",
+        "summary": "Browser CORS preflight",
+        "responses": {
+          "204": {
+            "description": "No body; query parameters are ignored for preflight",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "private, no-store, max-age=0"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string",
+                  "const": "*"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string",
+                  "const": "GET, HEAD, OPTIONS"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClientResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ip": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "isEUCountry": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "isEUCountry"
+            ]
+          },
+          "continent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "region": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "code"
+            ]
+          },
+          "postalCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "location": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "latitude": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -90,
+                "maximum": 90
+              },
+              "longitude": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -180,
+                "maximum": 180
+              },
+              "timezone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "latitude",
+              "longitude",
+              "timezone"
+            ]
+          },
+          "metroCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "asn": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "number": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1
+              },
+              "organization": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "number",
+              "organization"
+            ]
+          },
+          "enrichment": {
+            "$ref": "#/components/schemas/Enrichment"
+          }
+        },
+        "required": [
+          "ip",
+          "country",
+          "continent",
+          "city",
+          "region",
+          "postalCode",
+          "location",
+          "metroCode",
+          "asn"
+        ]
+      },
+      "Enrichment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ip": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "IPv4",
+                  "IPv6",
+                  null
+                ]
+              }
+            },
+            "required": [
+              "version"
+            ]
+          },
+          "country": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "flag": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "capitals": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "currencies": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "symbol": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "name",
+                    "symbol"
+                  ]
+                }
+              },
+              "languages": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "ISO 639-3 language code",
+                      "pattern": "^[a-z]{3}$"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "name"
+                  ]
+                }
+              },
+              "callingCodes": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string",
+                  "pattern": "^\\+[1-9][0-9]{0,2}$"
+                },
+                "description": "Country calling codes only, e.g. US, CA and DO all use +1; no national area codes."
+              }
+            },
+            "required": []
+          },
+          "continent": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "location": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "time": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/LocalTime"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "time"
+            ]
+          }
+        },
+        "required": []
+      },
+      "LocalTime": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "evaluatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Single UTC instant used for all time fields in this request"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "time": {
+            "type": "string",
+            "pattern": "^\\d{2}:\\d{2}:\\d{2}$"
+          },
+          "dateTime": {
+            "type": "string",
+            "description": "Local ISO date-time with numeric UTC offset, calculated from the client IANA time zone"
+          },
+          "utcOffset": {
+            "type": "string",
+            "pattern": "^[+-]\\d{2}:\\d{2}(:\\d{2})?$"
+          },
+          "utcOffsetSeconds": {
+            "type": "integer",
+            "description": "Seconds east of UTC; negative west of UTC"
+          }
+        },
+        "required": [
+          "evaluatedAt",
+          "date",
+          "time",
+          "dateTime",
+          "utcOffset",
+          "utcOffsetSeconds"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "English error message"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    }
+  }
+}

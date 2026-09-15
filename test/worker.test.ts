@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import worker from '../src/index.ts';
 
 function request(path = '/', cf?: Record<string, unknown>, headers: Record<string, string> = {}, method = 'GET') {
-  const req = new Request(`https://who-arrives.fthux.com${path}`, { headers, method });
+  const req = new Request(`https://who-arrives-api.fthux.com${path}`, { headers, method });
   if (cf) Object.defineProperty(req, 'cf', { value: cf });
   return req;
 }

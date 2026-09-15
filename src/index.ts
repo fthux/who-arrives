@@ -1,3 +1,6 @@
+import { parseFields } from './fields';
+import { enrich } from './enrichment';
+
 function text(value: unknown): string | null {
   return typeof value === 'string' && value.trim() !== '' ? value : null;
 }
@@ -68,7 +71,13 @@ export default {
       headers.set('Allow', 'GET, HEAD, OPTIONS');
       return json({ error: 'Method not allowed.' }, 405);
     }
-    if (url.search) return json({ error: 'Query parameters are not supported. This API only describes the current client.' }, 400);
-    return json(clientInfo(request));
+    let fields;
+    try {
+      fields = parseFields(url.searchParams);
+    } catch (error) {
+      return json({ error: error instanceof Error ? error.message : 'Invalid query parameters.' }, 400);
+    }
+    const client = clientInfo(request);
+    return json(fields.size ? { ...client, enrichment: enrich(client, fields) } : client);
   },
 } satisfies ExportedHandler;

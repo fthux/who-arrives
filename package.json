@@ -5,6 +5,9 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
+    "data:build": "node scripts/build-country-data.mjs",
+    "docs:build": "node scripts/build-openapi.mjs",
+    "test:dev": "node scripts/verify-dev.mjs",
     "types": "wrangler types",
     "typecheck": "npm run types && tsc --noEmit",
     "test": "tsx --test test/*.test.ts",
@@ -13,7 +16,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260915.1",

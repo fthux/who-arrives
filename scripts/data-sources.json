@@ -1,0 +1,8 @@
+{
+  "mledoze/countries": {
+    "commit": "c8015eebdd94c533358406b0d709f441389e1f2e"
+  },
+  "google/libphonenumber": {
+    "commit": "806ee32e8c8c74ca339d8c91a6d86ef58687c9f4"
+  }
+}
