@@ -25,7 +25,7 @@ Visit [https://who-arrives.fthux.com](https://who-arrives.fthux.com) to see how 
 
 ## Example
 
-```console
+```json
 $ curl https://who-arrives-api.fthux.com/
 {
   "ip": "203.0.113.42",
@@ -49,7 +49,7 @@ $ curl https://who-arrives-api.fthux.com/
 
 Add enrichment fields:
 
-```console
+```json
 $ curl "https://who-arrives-api.fthux.com/?fields=names,flag,time"
 {
   ...basic fields...,
