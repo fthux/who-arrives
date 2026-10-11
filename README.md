@@ -10,7 +10,7 @@ Current client IP, geolocation, and network information — served entirely from
 
 Visit [https://who-arrives.fthux.com](https://who-arrives.fthux.com) to see how Who Arrives works and explore its features. Visit [https://who-arrives-api.fthux.com](https://who-arrives-api.fthux.com) to try the Who Arrives API.
 
-<img src="promotions/og-image.png" alt="Who Arrives" />
+<img src="promotions/promotion.jpeg" alt="Who Arrives" />
 
 </div>
 
